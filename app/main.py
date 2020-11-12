@@ -63,7 +63,7 @@ async def inline_echo(inline_query: InlineQuery):
 
 
 if __name__ == '__main__':
-    threading.Thread(target=app.run).start()
+    threading.Thread(target=app.run, kwargs={'port': 8080}).start()
     executor.start_polling(dp, skip_updates=True)
 
 
