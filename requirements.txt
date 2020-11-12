@@ -17,3 +17,4 @@ six==1.15.0
 transliterate==1.10.2
 typing-extensions==3.7.4.3
 yarl==1.6.2
+Flask~=1.1.2

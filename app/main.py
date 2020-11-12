@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+from flask import Flask, jsonify
+import threading
 import os
 from transliterate.decorators import transliterate_function
 import hashlib
@@ -5,14 +8,22 @@ import logging
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineQuery, InputTextMessageContent, InlineQueryResultArticle
 
-# swpa_bot
-TOKEN = '1465325572:AAEsK0nWDGKcLMCMeOCU0PvhVsgGu9i_YlI'
-# environment = os.environ['ENV']
-
-logging.basicConfig(level=logging.DEBUG)
-
+load_dotenv()
+TOKEN = os.environ['TOKEN']
+environment = os.environ['ENV']
+logging.basicConfig(level=logging.WARNING)
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def hello():
+    return jsonify(
+        status='ok',
+        code=200
+    )
 
 
 @dp.message_handler(commands=['start'])
@@ -47,7 +58,12 @@ async def inline_echo(inline_query: InlineQuery):
         input_message_content=input_content,
     )
 
-    await bot.answer_inline_query(inline_query.id, results=[item], cache_time=300)
+    cache = 1 if environment == 'dev' else 300
+    await bot.answer_inline_query(inline_query.id, results=[item], cache_time=cache)
+
 
 if __name__ == '__main__':
+    threading.Thread(target=app.run).start()
     executor.start_polling(dp, skip_updates=True)
+
+
